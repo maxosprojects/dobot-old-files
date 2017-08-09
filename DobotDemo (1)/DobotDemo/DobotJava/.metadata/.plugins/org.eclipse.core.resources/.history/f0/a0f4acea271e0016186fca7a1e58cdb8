@@ -1,0 +1,10 @@
+package CPlusDll;
+
+public class DobotDllType {
+
+}
+
+public static class SYSTEMTIME extends Structure
+{
+	
+}

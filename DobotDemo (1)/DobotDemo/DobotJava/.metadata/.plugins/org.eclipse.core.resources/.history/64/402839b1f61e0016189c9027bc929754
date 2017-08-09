@@ -1,0 +1,153 @@
+import java.util.Timer;
+import java.util.TimerTask;
+
+import CPlusDll.DobotDll;
+import CPlusDll.DobotDll.*;
+
+public class Main
+{
+	public static void main(String[] args) {
+		try { 
+			
+			Main app = new Main();
+			app.Start();
+			
+			JogInstantCmd test = new JogInstantCmd();
+			test.isJoint = 1;
+	    	while(true)
+	    	{
+	    		try{
+	    			test.cmd = 1;
+	    			DobotDll.instance.SetJogInstantCmd(test);
+		    		Thread.sleep(200);
+		            test.cmd = 0;
+		            DobotDll.instance.SetJogInstantCmd(test);
+		    		Thread.sleep(1000);
+		            test.cmd = 2;
+		            DobotDll.instance.SetJogInstantCmd(test);
+		    		Thread.sleep(200);
+		            test.cmd = 0;
+		            DobotDll.instance.SetJogInstantCmd(test);
+		    		Thread.sleep(1000);
+		    		
+	    		} catch (Exception e) {  
+	                e.printStackTrace();  
+	            }
+	    	}
+			
+			//DobotDll.instance.DisconnectDobot();
+		} catch (Exception e) {  
+            e.printStackTrace();  
+        }
+	}
+
+	private void Start() {
+		
+		// 开启周期任务
+  		StartPeriodic();
+  		// 连接并初始化机械臂
+	    StartDobot();
+	    // 开始周期获取状态
+	    StartGetStatus()
+	}
+	/* (non-Java-doc)
+	 * @see java.lang.Object#Object()
+	 */
+	public Main() {
+		super();
+	}
+
+
+	private void StartDobot() {
+		
+		DobotResult ret = DobotResult.values()[DobotDll.instance.ConnectDobot()];
+        // 开始连接
+        if (ret == DobotResult.DobotResult_NotFound || ret == DobotResult.DobotResult_Occupied
+        		|| ret == DobotResult.DobotResult_NoDataUploaded)
+        {
+            Msg("连接发生错误，错误代码:" + ret.name());
+            return;
+        }
+        Msg("连接成功:" + ret.name());
+        // 复位并初始化
+        //DobotDll.instance.ResetDobot();
+        DobotDll.instance.SetCmdTimeout(500);
+        DobotDll.instance.SetEndType(EndType.EndTypePump.ordinal());
+
+        InitialPose initialPose = new InitialPose();
+        initialPose.joint2Angle = 45;
+        initialPose.joint3Angle = 45;
+        DobotDll.instance.SetInitialPose(initialPose);
+        
+        JogStaticParams jsParam = new JogStaticParams();
+        jsParam.jointMaxVelocity = 200;
+        jsParam.jointMaxAcceleration = 200;
+        jsParam.servoMaxVelocity = 200;
+        jsParam.servoMaxAcceleration = 200;
+        jsParam.linearMaxVelocity = 200;
+        jsParam.linearMaxAcceleration = 200;
+        DobotDll.instance.SetJogStaticParams(jsParam);
+
+        JogDynamicParams jdParam = new JogDynamicParams();
+        jdParam.velocityRatio = 30;
+        DobotDll.instance.SetJogDynamicParams(jdParam);
+
+        PlaybackStaticParams pbsParam = new PlaybackStaticParams();
+        pbsParam.jointMaxVelocity = 200;
+        pbsParam.jointMaxAcceleration = 200;
+        pbsParam.servoMaxVelocity = 200;
+        pbsParam.servoMaxAcceleration = 200;
+        pbsParam.linearMaxVelocity = 800;
+        pbsParam.linearMaxAcceleration = 1000;
+        pbsParam.pauseTime = 100;
+        pbsParam.jumpHeight = 20;
+        DobotDll.instance.SetPlaybackStaticParams(pbsParam);
+
+        PlaybackDynamicParams pbdParam = new PlaybackDynamicParams();
+        pbdParam.velocityRatio = 30;
+        pbdParam.accelerationRatio = 30;
+        DobotDll.instance.SetPlaybackDynamicParams(pbdParam);
+        
+	}
+
+	private void StartPeriodic() {
+		
+		Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+            	// 周期调用200ms
+                DobotDll.instance.PeriodicTask();
+            }
+        }, 10, 100);// 设定指定的时间time,此处为200毫秒
+        
+        Timer timerPos = new Timer();
+        timerPos.schedule(new TimerTask() {
+            public void run() {
+            	// 周期调用300ms
+            	Pose pose = new Pose();
+                DobotDll.instance.GetPose(pose);
+
+                Msg("joint1Angle="+pose.jointAngle[0]+"  " 
+                		+ "joint2Angle="+pose.jointAngle[1]+"  "
+                		+ "joint3Angle="+pose.jointAngle[2]+"  "
+                		+ "joint4Angle="+pose.jointAngle[3]+"  "
+                		+ "x="+pose.x+"  "
+                		+ "y="+pose.y+"  "
+                		+ "z="+pose.z+"  "
+                		+ "rHead="+pose.rHead+"  "
+                		+ "isGripper="+pose.gripper+"  ");
+                ;
+            }
+        }, 100, 500);// 设定指定的时间time,此处为300毫秒
+        
+	}
+	
+	private void StartGetStatus() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void Msg(String string) {
+		System.out.println(string); 
+	}
+}

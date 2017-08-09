@@ -1,0 +1,168 @@
+<% include header.html %>
+
+<h1 class="sz30">Welcome to Dobot JS Client!</h1>
+
+<div class="ui-widget">
+	<p>This page demonstrates dobot control in javascript that call in dobot api with tcp socket. Please make sure you are connect dobot with usb in host.</p>
+</div>
+
+<h2 class="demoHeaders">
+	<label>地址：</label><input type="text" id="addr" value="127.0.0.1">
+	<label>端口：</label><input type="text" id="port" value="8881">
+	<button class="button" onclick="dobotUI.connect();">ConnectDobot</button> 
+	<button class="button" onclick="dobotUI.disconnect();">DisconnectDobot</button>
+	<button class="button" onclick="dobotUI.reset();">Reset Dobot</button> 
+	<button class="button" onclick="dobotUI.setCmdTimeout();">setCmdTimeout</button> 
+	<button class="button" onclick="dobotUI.setJogStaticParams();">setJogStaticParams</button> 
+	<button class="button" onclick="dobotUI.setPlaybackStaticParams();">setPlaybackStaticParams</button> 
+	<button class="button" onclick="dobotUI.setInitialPose();">setInitialPose</button> 
+</h2> 
+
+<!-- Tip -->
+<h2 class="demoHeaders  sz25">Tip</h2>
+<div class="ui-widget">
+	<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
+		<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+		<strong>Alert:</strong> <b id="tip">tip</b></p>
+	</div>
+</div>
+
+<!-- EndType -->
+<h2 class="demoHeaders  sz25">EndType</h2>
+<h2 class="demoHeaders">
+	<label class="lblSelect">
+		<select id="endTypeSelect" onchange="endTypeSelectFun()"  class="jselect">
+			<option selected="selected" value="0">Pump</option>
+			<option value="1">Gripper</option>
+			<option value="2">Laser</option>
+		</select>
+	</label>
+
+	<label class="mgl"></label>
+
+	<label><input id="Grab" type="checkbox" value="" onclick="grabClick()"/>Grab</label>
+	<label><input id="Laser" type="checkbox" value="" onclick="laserClick()"/>Laser</label>
+
+	<label class="mgl"></label>
+
+	<button class="button" name="btnGrp" onmousedown="dobotUI.setJogInstantCmd(11, 1);" onmouseup="dobotUI.setJogInstantCmd(11, 0);">Grapper+</button>
+	<button class="button" name="btnGrp" onmousedown="dobotUI.setJogInstantCmd(12, 1);" onmouseup="dobotUI.setJogInstantCmd(12, 0);">Grapper-</button>
+</h2>
+
+<!-- Jog -->
+<h2 class="demoHeaders  sz25">Jog</h2>
+<h2 class="demoHeaders">
+	<label class="mgl"></label>
+
+	<label class="lblSelect">
+		<select id="jointTypeSelect" class="jselect" onchange="jointTypeSelectFun()">
+			<option selected="selected" value="0">Linear</option>
+			<option value="1">Axis</option>
+		</select>
+	</label>
+
+	<label class="mgl"></label>
+	<dl>
+		<dd><label>velocityRatio</label></dd>
+		<dd><label class="mgl"></label></dd>
+		<dd><div id="slider" style="width:300px;"></div></dd>
+		<dd><input id="sliderVal" class="spinner" readonly="readonly"></dd>
+	</dl>
+
+	<label class="mgl"></label>
+</h2>
+<label class="mgl"></label>
+<h2 class="demoHeaders" id="btnGroup1">
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(1, 1);" onmouseup="dobotUI.setJogInstantCmd(1, 0);">X+</button>
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(2, 1);" onmouseup="dobotUI.setJogInstantCmd(2, 0);">X-</button>
+
+	<label class="mgl"></label>
+
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(3, 1);" onmouseup="dobotUI.setJogInstantCmd(3, 0);">Y+</button>
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(4, 1);" onmouseup="dobotUI.setJogInstantCmd(4, 0);">Y-</button>
+
+	<label class="mgl"></label>
+
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(5, 1);" onmouseup="dobotUI.setJogInstantCmd(5, 0);">Z+</button>
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(6, 1);" onmouseup="dobotUI.setJogInstantCmd(6, 0);">Z-</button>
+	
+	<label class="mgl"></label>
+
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(7, 1);" onmouseup="dobotUI.setJogInstantCmd(7, 0);">R+</button>
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(8, 1);" onmouseup="dobotUI.setJogInstantCmd(8, 0);">R-</button>
+</h2>
+<h2 class="demoHeaders" id="btnGroup2" style="display:none">
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(1, 1);" onmouseup="dobotUI.setJogInstantCmd(1, 0);">Joint1+</button>
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(2, 1);" onmouseup="dobotUI.setJogInstantCmd(2, 0);">Joint1-</button>
+
+	<label class="mgl"></label>
+
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(3, 1);" onmouseup="dobotUI.setJogInstantCmd(3, 0);">Joint2+</button>
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(4, 1);" onmouseup="dobotUI.setJogInstantCmd(4, 0);">Joint2-</button>
+
+	<label class="mgl"></label>
+
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(5, 1);" onmouseup="dobotUI.setJogInstantCmd(5, 0);">Joint2+</button>
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(6, 1);" onmouseup="dobotUI.setJogInstantCmd(6, 0);">Joint2-</button>
+	
+	<label class="mgl"></label>
+
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(7, 1);" onmouseup="dobotUI.setJogInstantCmd(7, 0);">Joint3+</button>
+	<button class="button" onmousedown="dobotUI.setJogInstantCmd(8, 1);" onmouseup="dobotUI.setJogInstantCmd(8, 0);">Joint3-</button>
+</h2>
+<!-- Angle -->
+<h2 class="demoHeaders sz25">Angle</h2>
+<h2 class="demoHeaders">
+	<label>Joint1Angle:</label><input id="joint1Angle" class="spinner" readonly="readonly">
+	<label>Joint2Angle:</label><input id="joint2Angle" class="spinner" readonly="readonly">
+	<label>Joint3Angle:</label><input id="joint3Angle" class="spinner" readonly="readonly">
+	<label>Joint4Angle:</label><input id="joint4Angle" class="spinner" readonly="readonly">
+	<label><input id="isRealDisStatus" type="checkbox" value="" checked="true" onclick="grabClick()"/> Snchronous Data</label>
+</h2>
+
+<!-- Playback -->
+<h2 class="demoHeaders sz25">Playback</h2>
+<h2 class="demoHeaders">
+	<label class="lblSelect">
+		<select id="modeStyleSelect" class="jselect">
+			<option selected="selected" value="0">Jump</option>
+			<option value="1">MOVJ</option>
+			<option value="2">MOVL</option>
+		</select>
+	</label>
+	<label><input id="isGrab" type="checkbox" value="" onclick="grabClick()"/>Grab</label>
+	<label>X:</label><input id="X" class="spinner">
+	<label>Y:</label><input id="Y" class="spinner">
+	<label>Z:</label><input id="Z" class="spinner">
+	<label>rHead:</label><input id="rHead" class="spinner">
+	<label>Gripper:</label><input id="Gripper" class="spinner">
+	<label>PauseTime:</label><input id="PauseTime" class="spinner">
+</h2>
+<h2 class="demoHeaders">
+	<dl>
+		<dd><label>velocityRatio</label></dd>
+		<dd><div id="psliderv" style="width:200px;"></div></dd>
+		<dd><input id="pslidervVal" class="spinner" readonly="readonly"></dd>
+	</dl>
+	<dl style="margin-left:20px;">
+		<dd><label>AccelerationRatio</label></dd>
+		<dd><div id="pslidera" style="width:200px;"></div></dd>
+		<dd><input id="pslideraVal" class="spinner" readonly="readonly"></dd>
+	</dl>
+
+	<label class="mgl"></label>
+	<button class="button" onclick="dobotUI.setPlaybackBufferCmd();">Send Playback Control Command</button>
+</h2>
+
+
+<script>
+$( ".button" ).button();
+$( ".spinner" ).spinner();
+
+$(function() {
+	/*init data*/
+	dobotUI.init();
+	/*init data end*/
+});
+</script>
+<% include footer.html %>

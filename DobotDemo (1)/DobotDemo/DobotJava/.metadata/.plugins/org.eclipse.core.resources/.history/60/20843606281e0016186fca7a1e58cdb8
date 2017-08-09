@@ -1,0 +1,15 @@
+package CPlusDll;
+
+import com.sun.jna;
+
+public enum EndType
+{
+    EndTypePump,
+    EndTypeGripper,
+    EndTypeLaser
+};
+
+public static class SYSTEMTIME extends Structure
+{
+	
+}

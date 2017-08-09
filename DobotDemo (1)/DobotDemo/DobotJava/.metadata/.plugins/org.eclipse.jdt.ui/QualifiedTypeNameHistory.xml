@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.sun.jna.win32.StdCallLibrary"/>
+<fullyQualifiedTypeName name="com.sun.jna.Structure"/>
+<fullyQualifiedTypeName name="java.awt.List"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="java.util.Timer"/>
+<fullyQualifiedTypeName name="CPlusDll.DobotDll"/>
+<fullyQualifiedTypeName name="CPlusDll.DobotDll.DobotResult"/>
+<fullyQualifiedTypeName name="CPlusDll.DobotDll.EndType"/>
+<fullyQualifiedTypeName name="CPlusDll.DobotDll.Pose.ByReference"/>
+<fullyQualifiedTypeName name="java.util.Scanner"/>
+<fullyQualifiedTypeName name="Main.Thread2"/>
+<fullyQualifiedTypeName name="com.sun.jna.Callback"/>
+<fullyQualifiedTypeName name="CPlusDll.DobotDll.JavaDebug"/>
+</qualifiedTypeNameHistroy>

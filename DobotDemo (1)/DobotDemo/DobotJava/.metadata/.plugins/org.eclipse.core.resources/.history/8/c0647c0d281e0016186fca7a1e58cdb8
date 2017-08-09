@@ -1,0 +1,13 @@
+package CPlusDll;
+
+public enum EndType
+{
+    EndTypePump,
+    EndTypeGripper,
+    EndTypeLaser
+};
+
+public static class SYSTEMTIME extends Structure
+{
+	
+}

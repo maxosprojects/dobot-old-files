@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<playback>
+    <point>
+        <motionStyle>JUMP</motionStyle>
+        <isGrab>false</isGrab>
+        <x>270</x>
+        <y>10</y>
+        <z>25</z>
+        <rHead>0</rHead>
+        <gripper>0</gripper>
+        <pauseTime>1</pauseTime>
+    </point>
+    <point>
+        <motionStyle>JUMP</motionStyle>
+        <isGrab>false</isGrab>
+        <x>270</x>
+        <y>20</y>
+        <z>25</z>
+        <rHead>0</rHead>
+        <gripper>0</gripper>
+        <pauseTime>1</pauseTime>
+    </point>
+    <point>
+        <motionStyle>JUMP</motionStyle>
+        <isGrab>false</isGrab>
+        <x>270</x>
+        <y>30</y>
+        <z>25</z>
+        <rHead>0</rHead>
+        <gripper>0</gripper>
+        <pauseTime>1</pauseTime>
+    </point>
+    <point>
+        <motionStyle>JUMP</motionStyle>
+        <isGrab>false</isGrab>
+        <x>270</x>
+        <y>40</y>
+        <z>25</z>
+        <rHead>0</rHead>
+        <gripper>0</gripper>
+        <pauseTime>1</pauseTime>
+	</point>
+</playback>

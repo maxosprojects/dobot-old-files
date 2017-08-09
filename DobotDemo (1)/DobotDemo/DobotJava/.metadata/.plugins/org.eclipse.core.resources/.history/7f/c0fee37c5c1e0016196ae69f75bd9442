@@ -1,0 +1,248 @@
+package CPlusDll;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sun.jna.Library;  
+import com.sun.jna.Native;
+import com.sun.jna.Structure;  
+
+public interface DobotDll extends Library 
+{  
+	DobotDll instance = (DobotDll) Native.loadLibrary("DobotDll",  DobotDll.class);  
+	
+
+	public enum EndType
+    {
+        EndTypePump,
+        EndTypeGripper,
+        EndTypeLaser
+    };
+    
+    public static class InitialPose extends Structure
+    {
+    	public static class ByReference extends InitialPose implements Structure.ByReference { }  
+        public static class ByValue extends InitialPose implements Structure.ByValue{ } 
+        
+        public float joint2Angle;
+        public float joint3Angle;
+		@Override
+		protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("joint2Angle");  
+		       a.add("joint3Angle");          
+		       return a;  
+		}
+    };
+    
+    public static class Pose extends Structure
+    {
+    	public static class ByReference extends InitialPose implements Structure.ByReference { }  
+        public static class ByValue extends InitialPose implements Structure.ByValue{ } 
+        
+        public float x;
+        public float y;
+        public float z;
+        public float rHead;
+        public float[] jointAngle = new float[4];;
+        public byte isGrab;
+        public float gripper;
+		@Override
+		protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("x");  
+		       a.add("y"); 
+		       a.add("z"); 
+		       a.add("rHead"); 
+		       a.add("jointAngle");
+		       a.add("isGrab"); 
+		       a.add("gripper"); 
+		       return a;  
+		}
+    };
+    
+    public static class JogStaticParams extends Structure
+    {
+        public float jointMaxVelocity;
+        public float jointMaxAcceleration;
+        public float servoMaxVelocity;
+        public float servoMaxAcceleration;
+        public float linearMaxVelocity;
+        public float linearMaxAcceleration;
+		@Override
+		protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("jointMaxVelocity");  
+		       a.add("jointMaxAcceleration"); 
+		       a.add("servoMaxVelocity"); 
+		       a.add("servoMaxAcceleration"); 
+		       a.add("linearMaxVelocity");
+		       a.add("linearMaxAcceleration");
+		       return a;  
+		}
+    };
+
+    public static class JogDynamicParams extends Structure
+    {
+        public float velocityRatio;
+        protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("velocityRatio");
+		       return a;  
+		}
+    };
+    
+    public enum JogCmd
+    {
+        JogIdle,
+        JogAPPressed,
+        JogANPressed,
+        JogBPPressed,
+        JogBNPressed,
+        JogCPPressed,
+        JogCNPressed,
+        JogDPPressed,
+        JogDNPressed,
+        JogGrab,
+        JogRelease,
+        JogGPPressed,
+        JogGNPressed,
+        JogLaserOn,
+        JogLaserOff
+    };
+
+    public static class JogInstantCmd extends Structure
+    {
+    	public static class ByReference extends InitialPose implements Structure.ByReference { }  
+        public static class ByValue extends InitialPose implements Structure.ByValue{ } 
+        
+        public byte isJoint;
+        public int cmd;
+        protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("isJoint");  
+		       a.add("cmd");
+		       return a;  
+		}
+    };
+
+    public static class PlaybackStaticParams extends Structure
+    {
+        public float jointMaxVelocity;
+        public float jointMaxAcceleration;
+        public float servoMaxVelocity;
+        public float servoMaxAcceleration;
+        public float linearMaxVelocity;
+        public float linearMaxAcceleration;
+        public float pauseTime;
+        public float jumpHeight;
+        protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("jointMaxVelocity");  
+		       a.add("jointMaxAcceleration"); 
+		       a.add("servoMaxVelocity"); 
+		       a.add("servoMaxAcceleration"); 
+		       a.add("linearMaxVelocity");
+		       a.add("linearMaxAcceleration");
+		       a.add("pauseTime");
+		       a.add("jumpHeight");
+		       return a;  
+		}
+    };
+
+    public static class PlaybackDynamicParams extends Structure
+    {
+        public float velocityRatio;
+        public float accelerationRatio;
+        protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("velocityRatio");  
+		       a.add("accelerationRatio");
+		       return a;  
+		}
+    };
+
+    public enum PlaybackInstantCmd
+    {
+        PlaybackStart,
+        PlaybackPause,
+        PlaybackStop
+    };
+
+    public static class PlaybackPoint extends Structure
+    {
+    	public static class ByReference extends InitialPose implements Structure.ByReference { }  
+        public static class ByValue extends InitialPose implements Structure.ByValue{ } 
+        
+        public byte motionStyle;
+        public byte isGrab;
+        public float x;
+        public float y;
+        public float z;
+        public float rHead;
+        public float gripper;
+        public float pauseTime;
+        protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("motionStyle");  
+		       a.add("isGrab"); 
+		       a.add("x"); 
+		       a.add("y"); 
+		       a.add("z");
+		       a.add("rHead");
+		       a.add("gripper");
+		       a.add("pauseTime");
+		       return a;  
+		}
+    };
+
+    public static class PlaybackBufferCmd extends Structure
+    {
+        public PlaybackPoint.ByValue playbackPoint;
+        protected List<String> getFieldOrder() {
+			List<String> a = new ArrayList<String>();  
+		       a.add("playbackPoint");
+		       return a;  
+		}
+    };
+
+    public enum DobotResult
+    {
+        DobotResult_NoError,
+        DobotResult_Sensor1Warning,
+        DobotResult_Sensor2Warning,
+        DobotResult_Sensor12Warning,
+
+        DobotResult_NotFound,
+        DobotResult_Occupied,
+        DobotResult_NoDataUploaded,
+        DobotResult_BufferFull,
+        DobotResult_Timeout,
+    };
+    
+    int ConnectDobot();
+    void DisconnectDobot();
+    void ResetDobot();
+    void PeriodicTask();
+    int SetCmdTimeout(int cmdTimeout);
+
+    // Public functions
+    // EndType
+    int SetEndType(int endType);
+
+    // InitialPose
+    int SetInitialPose(InitialPose initialPose);
+
+    // Pose
+    int GetPose(Pose pose);
+
+    // Jog functions
+    int SetJogStaticParams(JogStaticParams jogStaticParams);
+    int SetJogDynamicParams(JogDynamicParams jogDynamicParams);
+    int SetJogInstantCmd(JogInstantCmd jogInstantCmd);
+
+    // Playback functions
+    int SetPlaybackStaticParams(PlaybackStaticParams playbackStaticParams);
+    int SetPlaybackDynamicParams(PlaybackDynamicParams playbackDynamicParams);
+    int SetPlaybackBufferCmd(PlaybackBufferCmd playbackBufferCmd);
+}
