@@ -28,6 +28,10 @@ dobot_interface.set_playback_config()
 
 z_up = -20
 z_down = -70
+RH_Voltage = 2.8;
+PD_Voltage = 1.8;
+EC_Voltage = 1.2;
+
 
           # X, Y, Shake_Duration
 # Beakers = [ [0, 0, 0], #0 dummy beaker for numbering
@@ -163,6 +167,7 @@ if(int(a) == 0):
         move_angles(-106, 30, 10);
         move_angles(-132, 30, 10);
         #interactive_run();
+        thisBoard.setVoltage(EC_Voltage);
         print("Voltage is ", thisBoard.readVoltage());
         up_down_beaker(1);
         
@@ -203,6 +208,7 @@ if(int(a) == 0):
         print("Voltage is ", thisBoard.readVoltage());
         move_angles(5, 30, 20);
         move_angles(25, 30, 20);
+        thisBoard.setVoltage(PD_Voltage);
         up_down_beaker(8);
         
         #9
@@ -221,6 +227,7 @@ if(int(a) == 0):
         move_angles(100, 20, 20);
         move_angles(120, 20, 20);
         move_angles(130, 20, 20);
+        thisBoard.setVoltage(RH_Voltage);
         up_down_beaker(11);
         
         #12
