@@ -111,7 +111,8 @@ class Arduino(object):
         self.SoftwareSerial = SoftwareSerial(self)
         self.Servos = Servos(self)
         self.EEPROM = EEPROM(self)
-
+        self.spi = SPI(self)
+        
     def version(self):
         return get_version(self.sr)
 
@@ -423,6 +424,39 @@ class Wires(object):
     def __init__(self, board):
         self.board = board
         self.sr = board.sr
+
+class SPI(object):
+
+    def __init__(self,board):
+        self.board = board;
+        self.sr = board.sr;
+        
+    def spiBegin(self, pin):
+        cmd_str = build_cmd_str("spib", (pin,))
+        try:
+            self.sr.write(cmd_str)
+            self.sr.flush()
+        except:
+            pass
+    def spiWrite(self, pin, val):
+        """
+        Sends spiWrite pwm command
+        to SPI. ChipSelct to be set as pin.
+        -------------
+        inputs:
+           pin : pin number
+           val : integer 0 (off) to 128 (always on)
+        """
+        if val > 128:
+            val = 128
+        elif val < 0:
+            val = 0
+        cmd_str = build_cmd_str("spiw", (pin, val))
+        try:
+            self.sr.write(cmd_str)
+            self.sr.flush()
+        except:
+            pass
 
 
 class Servos(object):

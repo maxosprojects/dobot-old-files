@@ -39,6 +39,9 @@ class ArduinoBoard:
         else:
             print "Initialized Gripper Servo";
         
+        # 53 if Arduino Mega is selected since it is the SS pin 
+        self.board.spi.spiBegin(53);
+        
         time.sleep(1);
         print "Attaching Servo..";
         self.gripperServo.attach(self.gripperServoPin, self.gripperServoClose, self.gripperServoOpen);
@@ -58,9 +61,20 @@ class ArduinoBoard:
         self.board.pinMode(self.RHRelay, "OUTPUT");
         print "Pin Modes Set";
         
-    def setVoltage(self):
-        #do something
-        i = 0;
+    def setVoltage(self, desiredV):
+        #   wiper-0 = 0.1v
+        #   wiper-64 = 5.3v
+        #   wiper-128 = 5.7v
+        # do mapping of digipot wiper position and voltage
+        #   desiredPos = desiredV / ?
+        # self.setDigitalPot(desiredPos);
+        if(desiredV < 5):
+            self.board.spi.spiWrite(53, int((10.8 - desiredV) / 0.084))
+        else:
+            print "Currently, Cannot Set more than 5v through System";
+        
+    def setDigitalPot(self, desiredPos):
+        self.board.spi.spiWrite(53, desiredPos);
     
     def readVoltage(self):
         vout = 0.0;

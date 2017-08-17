@@ -2,11 +2,14 @@
 #include <Wire.h>
 #include <Servo.h>
 #include <EEPROM.h>
+#include <SPI.h>
 
 SoftwareSerial *sserial = NULL;
 Servo servos[8];
 int servo_pins[] = {0, 0, 0, 0, 0, 0, 0, 0};
 boolean connected = false;
+byte SPIaddress = 0x00;
+
 
 int Str2int (String Str_value)
 {
@@ -316,6 +319,29 @@ void EEPROMHandler(int mode, String data) {
     }
 }
 
+void spiBegin(String data)
+{
+  int csPin = Str2int(data);
+  pinMode(csPin, OUTPUT);
+  SPI.begin();
+}
+  
+
+void spiWrite(String data)
+{
+    String sdata[2];
+    split(sdata,2,data,'%');
+    //chip select pin
+    int csPin = Str2int(sdata[0]);
+    int pv = Str2int(sdata[1]);
+
+    digitalWrite(csPin, LOW);
+    SPI.transfer(SPIaddress);
+    SPI.transfer(pv);
+    digitalWrite(csPin, HIGH);
+}
+
+
 void SerialParser(void) {
   char readChar[64];
   Serial.readBytesUntil(33,readChar,64);
@@ -399,7 +425,13 @@ void SerialParser(void) {
   }  
   else if (cmd == "sz") {  
       sizeEEPROM();
+  }
+  else if (cmd == "spiw") {
+      spiWrite(data);
   }  
+  else if (cmd == "spib") {
+      spiBegin(data);
+  }
 }
 
 void setup()  {
