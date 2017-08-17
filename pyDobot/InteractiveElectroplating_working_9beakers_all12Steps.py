@@ -27,7 +27,7 @@ dobot_interface.set_playback_config()
 
 
 z_up = -20
-z_down = -80
+z_down = -70
 
           # X, Y, Shake_Duration
 # Beakers = [ [0, 0, 0], #0 dummy beaker for numbering
@@ -47,7 +47,8 @@ z_down = -80
             
 Beakers = [ [0, 0, 0],      #0 dummy beaker for numbering
             [-140, -165, 5], #1 # -135deg
-            [-112, -271, 5],  #2 #  -112.6deg
+            #[-112, -271, 5],  #2 #  -112.6deg
+            [-95, -284, 5],  #2 #  -112.6deg
             [0, -211, 5], #3 # -90deg
             [112, -271, 5], #4 # -67.6deg
             [149, -149, 5], #5 # -45deg
@@ -104,23 +105,29 @@ def shake(x, y, z, shakeDuration):
         move_xy(x, y, z + 10, 0.3);
         move_xy(x, y, z - 10, 0.3);
     
-    time.sleep(1);
     #move_xy(x, y, z_UP, 1);
     
 def up_down_beaker(id):
 
     print "Doing beaker %d now" % (id);
-    
     move_xy(Beakers[id][0], Beakers[id][1], z_up);
     move_xy(Beakers[id][0], Beakers[id][1], z_down);
     
+    if(id == 1):
+        thisBoard.startCurrentEC();
+    elif(id == 8):
+        thisBoard.startCurrentPD();
+    elif(id == 11):
+        thisBoard.startCurrentRH();
+        
     shake(Beakers[id][0], Beakers[id][1], z_down, Beakers[id][2]); #x, y, z and shake_duration
     
+    thisBoard.stopCurrent();
     #move up
     move_xy(Beakers[id][0], Beakers[id][1], z_up);
     
     #shake to drop the excess drops
-    shake(Beakers[id][0], Beakers[id][1], z_up, 2);
+    shake(Beakers[id][0], Beakers[id][1], z_up, 1);
  
 #time.sleep(3);
 
@@ -129,22 +136,25 @@ move_xy(home_xyz[0], home_xyz[1], home_xyz[2]);
 thisBoard = ArduinoBoard(9600, 'COM6');
 print "Initialized Arduino Board at COM6 port with 9600 BaudRate";
 time.sleep(1);
-grip = raw_input("Press Enter to Open Gripper..");
 thisBoard.gripperOpen();
 
-a = raw_input("Enter 0 for automatic movement, and 1 for interactive: ");
+#a = raw_input("Enter 0 for automatic movement, and 1 for interactive: ");
 
+a = 0;
 
 if(int(a) == 0):
-    num = raw_input("Enter number of loops: ");
+    num = raw_input("Enter number of Jigs: ");
     num_loops = int(num);
     while(num_loops):
         num_loops = num_loops - 1;
         
-        
-        grip = raw_input("Place JIG and then Press Enter to Close Gripper..");
-        thisBoard.gripperClose();
-        grip = raw_input("Press Enter to Start Process..");
+        grip = '0';
+        while(grip == '0'):
+            thisBoard.gripperOpen();
+            grip = raw_input("Place Jig and then Press Enter to Close Gripper..");
+            thisBoard.gripperClose();
+            grip = raw_input("Press Enter to Start Process OR 0 if Jig isn't in place..");
+            
         
         #1
         move_angles(-40, 30, 10);
@@ -154,9 +164,7 @@ if(int(a) == 0):
         move_angles(-132, 30, 10);
         #interactive_run();
         print("Voltage is ", thisBoard.readVoltage());
-        thisBoard.startCurrentEC();
         up_down_beaker(1);
-        thisBoard.stopCurrent();
         
 
         #2
@@ -195,11 +203,8 @@ if(int(a) == 0):
         print("Voltage is ", thisBoard.readVoltage());
         move_angles(5, 30, 20);
         move_angles(25, 30, 20);
-        thisBoard.startCurrentPD();
-        #move_xy(Beakers[id][0], Beakers[id][1], z_up);
         up_down_beaker(8);
-        thisBoard.stopCurrent();
-
+        
         #9
         print("Voltage is ", thisBoard.readVoltage());
         move_angles(45, 20, 20);
@@ -216,10 +221,8 @@ if(int(a) == 0):
         move_angles(100, 20, 20);
         move_angles(120, 20, 20);
         move_angles(130, 20, 20);
-        thisBoard.startCurrentRH();
         up_down_beaker(11);
-        thisBoard.stopCurrent();
-
+        
         #12
         print("Voltage is ", thisBoard.readVoltage());
         move_angles(120, 30, 10);
@@ -239,3 +242,6 @@ if(int(a) == 0):
         cc = raw_input("Press Enter to Continue ..");
 else:
     interactive_run();
+    
+#cleanup    
+del thisBoard;

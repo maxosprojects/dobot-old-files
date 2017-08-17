@@ -20,7 +20,7 @@ class ArduinoBoard:
     voltageSensorPin = 0;
     currentSensorPin = 2;
     gripperServoPin = 9;
-    gripperServoClose = 50;
+    gripperServoClose = 80;
     gripperServoOpen = 160;
     
     
