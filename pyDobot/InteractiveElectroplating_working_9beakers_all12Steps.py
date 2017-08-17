@@ -4,85 +4,16 @@ import sys
 import serial
 
 from DobotSerialInterface import DobotSerialInterface
-from Arduino import Arduino
+from PythonArduinoCommander import ArduinoBoard
+
+import serial.tools.list_ports
+ports = list(serial.tools.list_ports.comports())
+for i in ports:
+    print(i[0], " -- ", i[1], " -- ", i[2]);
 
 #DobotPort = '/dev/ttyACM0'
 DobotPort = 'COM4'
-
-class ArduinoBoard:
-    
-    arduinoPort = 'COM9';
-    arduinoBaudRate = 9600;    
-    board = None;
-    
-    ECRelay = 2;
-    PDRelay = 3;
-    RHRelay = 4;
-    
-    voltageSensorPin = 0;
-    currentSensorPin = 2;
-    
-    
-    
-    
-    def __init__(self, baud=arduinoBaudRate, port=arduinoPort):
-        self.board = Arduino(baud, port);
-        if(self.board is None):
-            print "Error Initializing Arduino Board"
-        else:
-            print "Initialized Arduino Board";
-        board.pinMode(ECRelay, "OUTPUT");
-        board.pinMode(PDRelay, "OUTPUT");
-        board.pinMode(RHRelay, "OUTPUT");
-        
-        self.stopCurrent();
-    
-    def setVoltage(self):
-        #do something
-        i = 0;
-    
-    def readVoltage(self):
-        vout = 0.0;
-        vin = 0.0;
-        voltageSensorR1 = 30000.0;   
-        voltageSensorR2 = 7500.0; 
-        voltageValue = self.board.analogRead(self.voltageSensorPin);
-        vout = (voltageValue * 5.0) / 1024.0; #offsetting the analogRead value
-        vin = vout / (R2/(R1+R2)); 
-        return vin;
-    
-    def readCurrent(self):
-        mVperAmp = 100; # use 100 for 20A Module and 66 for 30A Module
-        rawValue = self.board.analogRead(currentSensorPin); #can hold upto 64 10-bit A/D readings
-        ACSoffset = 2500;
-        voltage = 0;
-        amps = 0;
-        voltage = (rawValue / 1023.0) * 5000; # Gets you mV
-        amps = ((voltage - ACSoffset) / mVperAmp);
-        return amps;
-        
-    def startCurrentEC(self):
-        self.board.digitalWrite(self.ECRelay, "LOW");
-        self.board.digitalWrite(self.PDRelay, "HIGH");
-        self.board.digitalWrite(self.RHRelay, "HIGH");
-    
-    def startCurrentPD(self):
-        self.board.digitalWrite(self.ECRelay, "HIGH");
-        self.board.digitalWrite(self.PDRelay, "LOW");
-        self.board.digitalWrite(self.RHRelay, "HIGH");
-    
-    def startCurrentRH(self):   
-        self.board.digitalWrite(self.ECRelay, "HIGH");
-        self.board.digitalWrite(self.PDRelay, "HIGH");
-        self.board.digitalWrite(self.RHRelay, "LOW");    
-
-    def stopCurrent(self):
-        self.board.digitalWrite(self.ECRelay, "HIGH");
-        self.board.digitalWrite(self.PDRelay, "HIGH");
-        self.board.digitalWrite(self.RHRelay, "HIGH");
-        
-        
-
+                
 if len(sys.argv) >= 2:
     DobotPort = sys.argv[1];
 
@@ -94,8 +25,9 @@ print "Opened connection"
 dobot_interface.set_speed()
 dobot_interface.set_playback_config()
 
-z_up = 30;
-z_down = 20;
+
+z_up = -20
+z_down = -80
 
           # X, Y, Shake_Duration
 # Beakers = [ [0, 0, 0], #0 dummy beaker for numbering
@@ -119,8 +51,8 @@ Beakers = [ [0, 0, 0],      #0 dummy beaker for numbering
             [0, -211, 5], #3 # -90deg
             [112, -271, 5], #4 # -67.6deg
             [149, -149, 5], #5 # -45deg
-            [270, -122, 5],  #6 # -22.6deg
-            [210, 0, 5],    #7 # 0deg
+            [270, -102, 5],  #6 # -22.6deg
+            [210, 5, 5],    #7 # 0deg
             [271, 113, 5],  #8 # 22.4deg
             [149, 149, 5],   #9 # 45deg
             [112, 270, 5],    #10 # 67.4deg
@@ -173,7 +105,7 @@ def shake(x, y, z, shakeDuration):
         move_xy(x, y, z - 10, 0.3);
     
     time.sleep(1);
-    move_xy(x, y, z + 10, 1);
+    #move_xy(x, y, z_UP, 1);
     
 def up_down_beaker(id):
 
@@ -184,74 +116,112 @@ def up_down_beaker(id):
     
     shake(Beakers[id][0], Beakers[id][1], z_down, Beakers[id][2]); #x, y, z and shake_duration
     
-    #hold the position so the drops can drip - 5 second pause
-    move_xy(Beakers[id][0], Beakers[id][1], z_up, 5);
+    #move up
+    move_xy(Beakers[id][0], Beakers[id][1], z_up);
+    
+    #shake to drop the excess drops
+    shake(Beakers[id][0], Beakers[id][1], z_up, 2);
  
 #time.sleep(3);
 
 move_xy(home_xyz[0], home_xyz[1], home_xyz[2]);
 
+thisBoard = ArduinoBoard(9600, 'COM6');
+print "Initialized Arduino Board at COM6 port with 9600 BaudRate";
+time.sleep(1);
+grip = raw_input("Press Enter to Open Gripper..");
+thisBoard.gripperOpen();
+
 a = raw_input("Enter 0 for automatic movement, and 1 for interactive: ");
+
 
 if(int(a) == 0):
     num = raw_input("Enter number of loops: ");
     num_loops = int(num);
     while(num_loops):
         num_loops = num_loops - 1;
-        # #1
-        # move_angles(-40, 30, 10);
-        # move_angles(-60, 30, 10);
-        # move_angles(-90, 30, 10);
-        # move_angles(-106, 30, 10);
-        # move_angles(-132, 30, 10);
-        # #interactive_run();
-        # up_down_beaker(1);
-
-        # #2
-        # move_angles(-112, 30, 10);
-        # up_down_beaker(2);
-
-        # #3
-        # move_angles(-90, 30, 10);
-        # up_down_beaker(3);
-
-        # #4
-        # move_angles(-67, 30, 10);
-        # up_down_beaker(4);
-        # #interactive_run();
         
-        # #5
-        # move_angles(-45, 30, 20);
-        # up_down_beaker(5);
+        
+        grip = raw_input("Place JIG and then Press Enter to Close Gripper..");
+        thisBoard.gripperClose();
+        grip = raw_input("Press Enter to Start Process..");
+        
+        #1
+        move_angles(-40, 30, 10);
+        move_angles(-60, 30, 10);
+        move_angles(-90, 30, 10);
+        move_angles(-106, 30, 10);
+        move_angles(-132, 30, 10);
+        #interactive_run();
+        print("Voltage is ", thisBoard.readVoltage());
+        thisBoard.startCurrentEC();
+        up_down_beaker(1);
+        thisBoard.stopCurrent();
+        
+
+        #2
+        move_angles(-112, 30, 10);
+        print("Voltage is ", thisBoard.readVoltage());
+        up_down_beaker(2);
+        
+
+        #3
+        print("Voltage is ", thisBoard.readVoltage());
+        move_angles(-90, 30, 10);
+        up_down_beaker(3);
+
+        #4
+        print("Voltage is ", thisBoard.readVoltage());
+        move_angles(-67, 30, 10);
+        up_down_beaker(4);
+        #interactive_run();
+        
+        #5
+        print("Voltage is ", thisBoard.readVoltage());
+        move_angles(-45, 30, 20);
+        up_down_beaker(5);
 
         #6
-        move_angles(-20, 8, 20);    
+        print("Voltage is ", thisBoard.readVoltage());
+        move_angles(-25, 30, 20);    
         up_down_beaker(6);
         
         #7
-        move_angles(0, 30, 20);
+        print("Voltage is ", thisBoard.readVoltage());
+        move_angles(5, 30, 20);
         up_down_beaker(7);
 
         #8
-        move_angles(20, 30, 20);
+        print("Voltage is ", thisBoard.readVoltage());
+        move_angles(5, 30, 20);
+        move_angles(25, 30, 20);
+        thisBoard.startCurrentPD();
+        #move_xy(Beakers[id][0], Beakers[id][1], z_up);
         up_down_beaker(8);
+        thisBoard.stopCurrent();
 
         #9
+        print("Voltage is ", thisBoard.readVoltage());
         move_angles(45, 20, 20);
         up_down_beaker(9);
         
         #10
+        print("Voltage is ", thisBoard.readVoltage());
         move_angles(67, 20, 20);
         up_down_beaker(10);
         
         #11
+        print("Voltage is ", thisBoard.readVoltage());
         move_angles(89, 20, 20);
         move_angles(100, 20, 20);
         move_angles(120, 20, 20);
         move_angles(130, 20, 20);
+        thisBoard.startCurrentRH();
         up_down_beaker(11);
+        thisBoard.stopCurrent();
 
         #12
+        print("Voltage is ", thisBoard.readVoltage());
         move_angles(120, 30, 10);
         move_angles(97, 30, 10);
         up_down_beaker(12);
@@ -264,6 +234,8 @@ if(int(a) == 0):
         
         print "%d loops remaining" % (num_loops);
             
-        cc  = raw_input("Press Enter to Continue...");
+        cc  = raw_input("Press Enter to Open Gripper...");
+        thisBoard.gripperOpen();
+        cc = raw_input("Press Enter to Continue ..");
 else:
     interactive_run();
